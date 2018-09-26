@@ -120,7 +120,7 @@
     for (var j = 0; j < count; j++) {
       generateGoods.push(
           {
-            'id': j,
+            'id': 'good-' + j,
             'name': GOOD_NAMES[j],
             'picture': PATH + window.utils.getRandomElement(PICTURE_ROUTES),
             'amount': window.utils.getRandomValue(MIN_VALUE_AMOUNT, MAX_VALUE_AMOUNT),
@@ -176,6 +176,9 @@
     picture.src = item.picture;
     picture.alt = item.name;
 
+    // добавляем id
+    cardElement.id = item.id;
+
     cardElement.querySelector('.card__title').textContent = item.name;
 
     var price = cardElement.querySelector('.card__price');
@@ -187,10 +190,6 @@
     setNutrition(cardElement, item);
     cardElement.querySelector('.card__composition-list').textContent = item.nutritionFacts.contents;
 
-    cardElement.addEventListener('click', function (evtClick) {
-      window.catalog.cardClickHandler(evtClick);
-    });
-
     return cardElement;
   };
 
@@ -201,10 +200,10 @@
     cardsArray.forEach(function (good) {
       var renderCard = createDomCard(good);
       fragment.appendChild(renderCard);
-      catalog[good.name.toUpperCase()] = {'good': good, 'card': renderCard};
+      // объект каталог заполняем двумя коллекциями, срендереными dom элементами, соответствующие объекту карточки
+      catalog[good.id] = {'objCard': good, 'domCard': renderCard};
     });
     return fragment;
-
   };
 
   var init = function () {
