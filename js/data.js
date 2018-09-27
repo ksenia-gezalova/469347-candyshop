@@ -177,7 +177,7 @@
     picture.alt = item.name;
 
     // добавляем id
-    cardElement.id = item.id;
+    cardElement.setAttribute('data-id', item.id);
 
     cardElement.querySelector('.card__title').textContent = item.name;
 
@@ -206,6 +206,27 @@
     return fragment;
   };
 
+  var renderBasketGood = function (item) {
+    var basketGood = document.querySelector('#card-order').content.querySelector('.goods__card');
+    var content = basketGood.cloneNode(true);
+
+    var picture = content.querySelector('.card-order__img');
+    picture.src = item.picture;
+    picture.alt = item.name;
+
+    content.querySelector('.card-order__title').textContent = item.name;
+
+    var price = content.querySelector('.card-order__price');
+    price.textContent = item.price + ' ₽';
+
+    content.querySelector('.card-order__count').value = item.amount;
+
+    /*  content.addEventListener('click', function (evt) {
+      btnBasketHandler(evt, content);
+    }); */
+    return content;
+  };
+
   var init = function () {
     catalogCards.classList.remove('catalog__cards--load');
     catalogCards.querySelector('.catalog__load').classList.add('visually-hidden');
@@ -218,6 +239,7 @@
     addClassNameByGoodAvailability: addClassNameByGoodAvailability,
     createDomCard: createDomCard,
     catalog: catalog,
+    renderBasketGood: renderBasketGood,
     basket: basket
   };
 })();

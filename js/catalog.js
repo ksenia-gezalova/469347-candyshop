@@ -5,27 +5,45 @@
   var catalogCards = document.querySelector('.catalog__cards');
 
 
-  var cardClickHandler = function (evt, element) {
+  var cardClickHandler = function (evt) {
     evt.preventDefault();
     var target = evt.target;
+    var good = target.closest('.catalog__card');
+    var goodId = good.getAttribute('data-id');
+
     if (target.classList.contains('card__btn-composition')) {
-      window.data.catalog[element].querySelector('.card__composition').classList.toggle('card__composition--hidden');
+      (window.data.catalog[goodId]['domCard']).querySelector('.card__composition').classList.toggle('card__composition--hidden');
     } else if (target.classList.contains('card__btn-favorite')) {
       target.classList.toggle('card__btn-favorite--selected');
       target.blur();
     } else if (target.classList.contains('card__btn')) {
-      addCardToBasket();
+      var catalogItem = window.data.catalog[goodId];
+      if (catalogItem['domCard'].amount === 0) {
+        return;
+      }
+      if (window.data.basket[goodId]) {
+        catalogItem['domCard'].amount--;
+        target.blur();
+      } else {
+        addToBasket(catalogItem);
+      }
     }
-    /* catalogCards.removeEventListener('click', function (evtClick) {
+    catalogCards.removeEventListener('click', function (evtClick) {
       cardClickHandler(evtClick);
-    }); */
-    console.log(evt.target.getAttribute['data-id']);
+    });
+  };
+  var addToBasket = function (item) {
+    var addedProduct = Object.assign({}, item['objCard']);
+    addedProduct.amount = 1;
+    var card = window.data.renderBasketGood(addedProduct);
+    basketCards.classList.remove('goods__cards--empty');
+    basketCards.querySelector('.goods__card-empty').style.display = 'none';
+    basketCards.appendChild(card);
+    window.data.basket[item.id] = {'objCard': item, 'domCard': card};
   };
   catalogCards.addEventListener('click', function (evtClick, elem) {
     cardClickHandler(evtClick, window.data.catalog[elem]);
   });
-
-  console.log(window.data.catalog);
 
 
   var btnBasketHandler = function (evt, element) {
