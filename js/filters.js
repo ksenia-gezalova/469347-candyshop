@@ -268,8 +268,7 @@
     removeItems();
     uncheckedInput(inputsFilter);
     setCheckedOnFilter(evt.target);
-    activeFilters.kind = [];
-    activeFilters.facts = [];
+    resetFilters();
     Object.keys(items)
     .forEach(function (id) {
       if (items[id].good.amount > 0) {
