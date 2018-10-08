@@ -201,7 +201,6 @@
       activeFilters.sort = [];
       activeFilters.sort.push(target);
     }
-    // console.log(activeFilters.sort);
     removeItems();
     applyFilters(items, target);
   });
@@ -212,7 +211,7 @@
     } else if (activeFilters.sort.indexOf('Сначала дешёвые') === 0) {
       filterByPrice(items, 'min');
     } else if (activeFilters.sort.indexOf('По рейтингу') === 0) {
-      filterByPopular(items);
+      sortByPopular(items);
     } else if (activeFilters.sort.indexOf('Сначала популярные') === 0) {
       return items;
     }
@@ -240,17 +239,19 @@
       var isEmptySort = activeFilters.sort.length === 0;
       var isExistSort = !isEmptySort;
 
-      if ((isEmptyKind || isExistInKind) && (isEmptyFacts || isExistInFacts) && (isEmptyPrice || isExistPrice) && (isExistSort)
+      if ((isEmptyKind || isExistInKind) && (isEmptyFacts || isExistInFacts) && (isEmptyPrice || isExistPrice) && (isExistSort || isEmptySort)
       ) {
         filtered.push(current);
-        sortItems(filtered);
-      } else if ((isEmptyKind || isExistInKind) && (isEmptyFacts || isExistInFacts) && (isEmptyPrice || isExistPrice) && (isEmptySort)) {
-        addCardToFragment(current, fragment);
       }
     });
+    // filtered = sortItems(filtered);
+    filtered.forEach(function (_, i) {
+      addCardToFragment(filtered[i], fragment);
+    });
     catalogCards.appendChild(fragment);
-    rangeCount.textContent = '(' + catalogCards.querySelectorAll('.catalog__card').length + ')';
-    if ((catalogCards.querySelectorAll('.catalog__card')).length === 0) {
+    console.log(filtered);
+    rangeCount.textContent = '(' + filtered.length + ')';
+    if (filtered.length === 0) {
       showEmptyFilters();
     }
   };
@@ -389,19 +390,19 @@
       case 'min': items.sort(compareMin);
         break;
     }
-    items.forEach(function (_, i) {
+    /*  items.forEach(function (_, i) {
       addCardToFragment(items[i], fragment);
     });
-    catalogCards.appendChild(fragment);
+    catalogCards.appendChild(fragment); */
   });
 
   // фильтр по популярности
-  var filterByPopular = window.utils.debounce(function (items) {
+  var sortByPopular = window.utils.debounce(function (items) {
     items.sort(compareRating);
-    items.forEach(function (_, i) {
+    /*  items.forEach(function (_, i) {
       addCardToFragment(items[i], fragment);
     });
-    catalogCards.appendChild(fragment);
+    catalogCards.appendChild(fragment); */
   });
 
   var filterByPriceSlider = window.utils.debounce(function (evt, items) {
