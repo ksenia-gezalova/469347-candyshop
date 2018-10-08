@@ -359,7 +359,7 @@
         break;
     }
     priceArr.forEach(function (_, i) {
-      parent.querySelector('.input-btn__input').checked = true;
+
       addCardToFragment(priceArr[i], fragment);
     });
     catalogCards.appendChild(fragment);
@@ -369,9 +369,6 @@
   var filterByPopular = window.utils.debounce(function (evt, items) {
     var ratingArr = [];
     removeItems();
-    var tag = evt.target;
-    var parent = tag.closest('.input-btn');
-    parent.querySelector('.input-btn__input').checked = true;
     uncheckedInput(inputsFilter);
     Object.keys(items)
     .forEach(function (id) {
