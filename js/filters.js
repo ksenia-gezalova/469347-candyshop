@@ -22,7 +22,7 @@
     kind: [],
     facts: [],
     price: [],
-    sort: []
+    sort: ''
   };
 
   var MAX = 1;
@@ -192,21 +192,21 @@
     setCheckedOnFilter(evt.target);
     // если в фильтрах нет ни одной сортировки, добавляем текущий таргет
     if (activeFilters.sort.length === 0 || (activeFilters.sort.length === 0 && activeFilters.sort.indexOf(target) === -1)) {
-      activeFilters.sort.push(target);
+      activeFilters.sort = target;
     } else if (activeFilters.sort.length > 0 && activeFilters.sort.indexOf(target) !== -1) {
-      // если в фильтрах есть текущая сортировка очищаем массив
-      activeFilters.sort = [];
+      // если в фильтрах есть текущая сортировка очищаем
+      activeFilters.sort = '';
     } else if (activeFilters.sort.length > 0) {
-      // если в фильтрах нет текущего таргета, очищаем массив и добавляем таргет как вид сортировки
-      activeFilters.sort = [];
-      activeFilters.sort.push(target);
+      // если в фильтрах нет текущего таргета, очищаем и добавляем таргет как вид сортировки
+      activeFilters.sort = '';
+      activeFilters.sort = target;
     }
     removeItems();
     applyFilters(items, target);
   });
 
   var sortItems = function (items) {
-    if (activeFilters.sort.indexOf('Сначала дорогие') === 0) {
+    if (activeFilters.sort === 'Сначала дорогие') {
       items.sort(function (first, second) {
         if (first.price < second.price) {
           return 1;
@@ -216,7 +216,7 @@
           return 0;
         }
       });
-    } else if (activeFilters.sort.indexOf('Сначала дешёвые') === 0) {
+    } else if (activeFilters.sort === 'Сначала дешёвые') {
       items.sort(function (first, second) {
         if (first.price > second.price) {
           return 1;
@@ -226,7 +226,7 @@
           return 0;
         }
       });
-    } else if (activeFilters.sort.indexOf('По рейтингу') === 0) {
+    } else if (activeFilters.sort === 'По рейтингу') {
       items.sort(function (first, second) {
         if (first.rating.value > second.rating.value) {
           return -1;
@@ -239,7 +239,7 @@
         }
         return 0;
       });
-    } else if (activeFilters.sort.indexOf('Сначала популярные') === 0) {
+    } else if (activeFilters.sort === 'Сначала популярные') {
       return items;
     }
     return '';
