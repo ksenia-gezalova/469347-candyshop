@@ -213,7 +213,7 @@
       filterByPrice(items, 'min');
     } else if (activeFilters.sort.indexOf('По рейтингу') === 0) {
       filterByPopular(items);
-    } else {
+    } else if (activeFilters.sort.indexOf('Сначала популярные') === 0) {
       return items;
     }
     return '';
@@ -248,7 +248,7 @@
         addCardToFragment(current, fragment);
       }
     });
-    // catalogCards.appendChild(fragment);
+    catalogCards.appendChild(fragment);
     rangeCount.textContent = '(' + catalogCards.querySelectorAll('.catalog__card').length + ')';
     if ((catalogCards.querySelectorAll('.catalog__card')).length === 0) {
       showEmptyFilters();
@@ -437,6 +437,8 @@
       filterBySelected(evt, window.data.catalog);
     } else if (target === 'Показать всё') {
       showAll(window.data.catalog);
+    } else if (target === 'Сначала популярные') {
+      sort(evt, window.data.catalog);
     } else if (target === 'Сначала дорогие') {
       sort(evt, window.data.catalog);
     } else if (target === 'Сначала дешёвые') {
