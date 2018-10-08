@@ -24,6 +24,18 @@
     price: []
   };
 
+  var MAX = 1;
+  var MIN = 0;
+
+  var init = function () {
+    rangeMax.textContent = MAX_PRICE;
+    rangeMin.textContent = MIN_PRICE;
+    rangeFill.style.right = MIN_PRICE + 'px';
+    rangeFill.style.left = MIN_PRICE + 'px';
+    rangeRight.style.left = MAX_PRICE + 'px';
+    rangeLeft.style.left = MIN_PRICE + 'px';
+  };
+
   var uncheckedInput = function (items) {
     items.forEach(function (item) {
       item.checked = false;
@@ -37,6 +49,13 @@
     }
   };
 
+  var resetFilters = function () {
+    activeFilters.kind = [];
+    activeFilters.facts = [];
+    activeFilters.price = [];
+    init();
+  };
+
   // функция показа блока с пустым значением примененных фильтров
   var showEmptyFilters = function () {
     var notFound = document.querySelector('#empty-filters').content.querySelector('.catalog__empty-filter').cloneNode(true);
@@ -47,7 +66,7 @@
 
     btnSubmit.addEventListener('click', function (evt) {
       evt.preventDefault();
-      showAll(evt, window.data.catalog);
+      showAll(window.data.catalog);
     });
   };
 
@@ -110,7 +129,7 @@
           rangeMax.textContent = newLeft;
         }
 
-        filterByPriceSlider(window.data.catalog);
+        filterByPriceSlider(evt, window.data.catalog);
       };
       // снимаем обработчики при отпускании кнопки мыши
       var onMouseUp = function (upEvt) {
@@ -149,7 +168,7 @@
       return 'vegetarian';
     } else if (fact === 'Безглютеновое') {
       return 'gluten';
-    }
+    } return '';
   };
 
   // проверка существует ли фильтрафия по факту в массиве с фильтрами
@@ -181,9 +200,10 @@
       var isEmptyFacts = activeFilters.facts.length === 0;
       var isExistInFacts = !isEmptyFacts && checkIfExistInFacts(current.nutritionFacts);
 
-      if (
-        (isEmptyKind || isExistInKind) &&
-      (isEmptyFacts || isExistInFacts)
+      var isEmptyPrice = activeFilters.price.length === 0;
+      var isExistPrice = !isEmptyPrice && (current.price <= activeFilters.price[MAX] && current.price >= activeFilters.price[MIN]);
+
+      if ((isEmptyKind || isExistInKind) && (isEmptyFacts || isExistInFacts) && (isEmptyPrice || isExistPrice)
       ) {
         /* console.log('current', current);
         console.log('_________________________________'); */
@@ -267,8 +287,7 @@
     removeItems();
     uncheckedInput(inputsFilter);
     setCheckedOnFilter(evt.target);
-    activeFilters.kind = [];
-    activeFilters.facts = [];
+    resetFilters();
     Object.keys(items)
     .forEach(function (id) {
       if (items[id].good.isFavorite) {
@@ -282,12 +301,10 @@
   });
 
   // фильтр "показать все"
-  var showAll = window.utils.debounce(function (evt, items) {
+  var showAll = window.utils.debounce(function (items) {
     removeItems();
     uncheckedInput(inputsFilter);
-    setCheckedOnFilter(evt.target);
-    activeFilters.kind = [];
-    activeFilters.facts = [];
+    resetFilters();
     Object.keys(items)
     .forEach(function (id) {
       addCardToFragment(items[id].good, fragment);
@@ -327,7 +344,7 @@
   };
 
   // фильтр по цене
-  var filterByPrice = window.utils.debounce(function (evt, items, value) {
+  var filterByPrice = window.utils.debounce(function (items, value) {
     var priceArr = [];
     removeItems();
     uncheckedInput(inputsFilter);
@@ -367,23 +384,19 @@
     catalogCards.appendChild(fragment);
   });
 
-  var filterByPriceSlider = window.utils.debounce(function (items) {
-    var filteredItems = [];
-    removeItems();
-    Object.keys(items)
-    .forEach(function (id) {
-      if (items[id].good.price <= rangeMax.innerText && items[id].good.price >= rangeMin.innerText) {
-        filteredItems.push(items[id].good);
-      }
-    });
-    rangeCount.textContent = '(' + filteredItems.length + ')';
-    filteredItems.forEach(function (_, i) {
-      addCardToFragment(filteredItems[i], fragment);
-    });
-    catalogCards.appendChild(fragment);
-    if ((catalogCards.querySelectorAll('.catalog__card')).length === 0) {
-      showEmptyFilters();
+  var filterByPriceSlider = window.utils.debounce(function (evt, items) {
+    var target = evt.target;
+    // добавляем в массив фильтрации по цене заданный диапазон
+    // если массив с ценой пуст
+    if (activeFilters.price.length === 0) {
+      activeFilters.price.push(rangeMin.innerText, rangeMax.innerText);
+    } else if (activeFilters.price.length > 0) {
+      // если в массиве есть предыдущая информация по цене, очищаем массив и добавляем новый диапазон
+      activeFilters.price = [];
+      activeFilters.price.push(rangeMin.innerText, rangeMax.innerText);
     }
+    removeItems();
+    applyFilters(items, target);
   });
 
   // хэндлер для работы с фильтрами в баре
@@ -403,11 +416,11 @@
     } else if (target === 'Только избранное') {
       filterBySelected(evt, window.data.catalog);
     } else if (target === 'Показать всё') {
-      showAll(evt, window.data.catalog);
+      showAll(window.data.catalog);
     } else if (target === 'Сначала дорогие') {
-      filterByPrice(evt, window.data.catalog, 'max');
+      filterByPrice(window.data.catalog, 'max');
     } else if (target === 'Сначала дешёвые') {
-      filterByPrice(evt, window.data.catalog, 'min');
+      filterByPrice(window.data.catalog, 'min');
     } else if (target === 'По рейтингу') {
       filterByPopular(evt, window.data.catalog);
     }
@@ -432,16 +445,6 @@
     });
     rangeCount.textContent = '(' + (Object.keys(items)).length + ')';
   };
-
-  var init = function () {
-    rangeMax.textContent = MAX_PRICE;
-    rangeMin.textContent = MIN_PRICE;
-    rangeFill.style.right = MIN_PRICE + 'px';
-    rangeFill.style.left = MIN_PRICE + 'px';
-    rangeRight.style.left = MAX_PRICE + 'px';
-    rangeLeft.style.left = MIN_PRICE + 'px';
-  };
-
 
   init();
   pinMove(rangeRight);
